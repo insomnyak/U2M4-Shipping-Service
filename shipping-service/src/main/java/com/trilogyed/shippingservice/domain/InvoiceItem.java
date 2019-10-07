@@ -27,6 +27,8 @@ public class InvoiceItem {
     @Digits(integer = 5, fraction = 2)
     private BigDecimal shipCost;
 
+    private Invoice invoice;
+
     public Integer getInvoiceItemId() {
         return invoiceItemId;
     }
@@ -73,6 +75,14 @@ public class InvoiceItem {
 
     public void setShipCost(BigDecimal shipCost) {
         this.shipCost = shipCost;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
     @Override

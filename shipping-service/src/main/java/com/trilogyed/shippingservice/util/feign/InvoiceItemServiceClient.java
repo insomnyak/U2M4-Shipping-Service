@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@FeignClient(name = "invoice-service")
-@RequestMapping("/invoiceItem")
+@FeignClient(name = "invoice-service", contextId = "invoice-item-service")
+@RequestMapping("/invoiceItems")
 public interface InvoiceItemServiceClient {
+
     @PostMapping
     public InvoiceItem createInvoiceItem(@RequestBody @Valid InvoiceItem invoiceItem);
 
@@ -18,6 +19,9 @@ public interface InvoiceItemServiceClient {
 
     @DeleteMapping("/{invoiceItemId}")
     public void deleteInvoiceItemById(@PathVariable Integer invoiceItemId);
+
+    @DeleteMapping("/invoice/{invoiceId}")
+    public void deleteInvoiceItemByInvoiceId(@PathVariable Integer invoiceId);
 
     @GetMapping
     public List<InvoiceItem> getAllInvoiceItems();

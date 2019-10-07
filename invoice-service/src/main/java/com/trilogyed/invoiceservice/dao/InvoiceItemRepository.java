@@ -2,6 +2,7 @@ package com.trilogyed.invoiceservice.dao;
 
 import com.trilogyed.invoiceservice.model.InvoiceItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,4 +11,7 @@ import java.util.List;
 public interface InvoiceItemRepository extends JpaRepository<InvoiceItem, Integer> {
 
     List<InvoiceItem> findInvoiceItemByInvoiceId(Integer invoiceId);
+
+    @Modifying
+    void deleteInvoiceItemByInvoiceId(Integer invoiceId);
 }

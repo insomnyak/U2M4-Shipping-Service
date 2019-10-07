@@ -1,11 +1,9 @@
 package com.trilogyed.invoiceservice.controller;
 
-import com.trilogyed.invoiceservice.dao.InvoiceItemRepository;
-import com.trilogyed.invoiceservice.dao.InvoiceRepository;
 import com.trilogyed.invoiceservice.model.Invoice;
+import com.trilogyed.invoiceservice.service.InvoiceServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,38 +15,35 @@ import java.util.List;
 public class InvoiceController {
 
     @Autowired
-    InvoiceRepository invoiceRepo;
+    InvoiceServiceLayer sl;
 
-    @Transactional
     @PostMapping
     public Invoice createInvoice(@RequestBody @Valid Invoice invoice) {
-        return invoiceRepo.save(invoice);
+        return sl.save(invoice);
     }
 
-    @Transactional
     @PutMapping
     public void updateInvoice(@RequestBody @Valid Invoice invoice) {
-        invoiceRepo.save(invoice);
+        sl.update(invoice);
     }
 
-    @Transactional
     @DeleteMapping("/{invoiceId}")
     public void deleteInvoiceByInvoiceId(@PathVariable Integer invoiceId) {
-        invoiceRepo.deleteById(invoiceId);
+        sl.deleteById(invoiceId);
     }
 
     @GetMapping
     public List<Invoice> getAllInvoice() {
-        return invoiceRepo.findAll();
+        return sl.findAll();
     }
 
     @GetMapping("/{invoiceId}")
     public Invoice getInvoiceByInvoiceId(@PathVariable Integer invoiceId) {
-        return invoiceRepo.findById(invoiceId).orElse(null);
+        return sl.findById(invoiceId);
     }
 
     @GetMapping("/customer/{customerId}")
     public List<Invoice> getInvoicesByCustomerId(@PathVariable Integer customerId) {
-        return invoiceRepo.findInvoiceByCustomerId(customerId);
+        return sl.findInvoiceByCustomerId(customerId);
     }
 }

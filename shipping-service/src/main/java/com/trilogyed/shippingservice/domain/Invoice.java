@@ -4,6 +4,7 @@ import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
 public class Invoice {
 
@@ -32,6 +33,8 @@ public class Invoice {
     @NotNull
     @Digits(integer = 5, fraction = 2)
     private BigDecimal surcharge;
+
+    private Set<InvoiceItem> invoiceItems;
 
     public Integer getInvoiceId() {
         return invoiceId;
@@ -87,6 +90,14 @@ public class Invoice {
 
     public void setSurcharge(BigDecimal surcharge) {
         this.surcharge = surcharge;
+    }
+
+    public Set<InvoiceItem> getInvoiceItems() {
+        return invoiceItems;
+    }
+
+    public void setInvoiceItems(Set<InvoiceItem> invoiceItems) {
+        this.invoiceItems = invoiceItems;
     }
 
     @Override
