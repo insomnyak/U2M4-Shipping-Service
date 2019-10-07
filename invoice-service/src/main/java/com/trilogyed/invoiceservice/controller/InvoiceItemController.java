@@ -2,6 +2,7 @@ package com.trilogyed.invoiceservice.controller;
 
 import com.trilogyed.invoiceservice.dao.InvoiceItemRepository;
 import com.trilogyed.invoiceservice.model.InvoiceItem;
+import com.trilogyed.invoiceservice.service.InvoiceItemServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,38 +17,41 @@ import java.util.List;
 public class InvoiceItemController {
 
     @Autowired
-    InvoiceItemRepository invoiceItemRepo;
+    InvoiceItemServiceLayer sl;
 
-    @Transactional
     @PostMapping
     public InvoiceItem createInvoiceItem(@RequestBody @Valid InvoiceItem invoiceItem) {
-        return invoiceItemRepo.save(invoiceItem);
+        return sl.save(invoiceItem);
     }
 
-    @Transactional
     @PutMapping
     public void updateInvoiceItem(@RequestBody @Valid InvoiceItem invoiceItem) {
-        invoiceItemRepo.save(invoiceItem);
+        sl.update(invoiceItem);
+    }
+
+    @DeleteMapping("/{invoiceItemId}")
+    public void deleteInvoiceItemById(@PathVariable Integer invoiceItemId) {
+        sl.deleteById(invoiceItemId);
     }
 
     @Transactional
-    @DeleteMapping("/{invoiceItemId}")
-    public void deleteInvoiceItemById(@PathVariable Integer invoiceItemId) {
-        invoiceItemRepo.deleteById(invoiceItemId);
+    @DeleteMapping("/invoice/{invoiceId}")
+    public void deleteInvoiceItemByInvoiceId(@PathVariable Integer invoiceId) {
+        sl.deleteInvoiceItemByInvoiceId(invoiceId);
     }
 
     @GetMapping
     public List<InvoiceItem> getAllInvoiceItems() {
-        return invoiceItemRepo.findAll();
+        return sl.findAll();
     }
 
     @GetMapping("/{invoiceItemId}")
     public InvoiceItem getInvoiceItemById(@PathVariable Integer invoiceItemId) {
-        return invoiceItemRepo.findById(invoiceItemId).orElse(null);
+        return sl.findById(invoiceItemId);
     }
 
     @GetMapping("/invoice/{invoiceId}")
     public List<InvoiceItem> getInvoiceItemsByInvoiceId(@PathVariable Integer invoiceId) {
-        return invoiceItemRepo.findInvoiceItemByInvoiceId(invoiceId);
+        return sl.findInvoiceItemByInvoiceId(invoiceId);
     }
 }

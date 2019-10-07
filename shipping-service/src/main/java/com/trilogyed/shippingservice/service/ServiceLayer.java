@@ -4,18 +4,21 @@ import com.insomnyak.util.MapClasses;
 import com.trilogyed.shippingservice.domain.Invoice;
 import com.trilogyed.shippingservice.domain.InvoiceItem;
 import com.trilogyed.shippingservice.domain.InvoiceViewModel;
+import com.trilogyed.shippingservice.exceptions.TupleNotFoundException;
 import com.trilogyed.shippingservice.util.feign.InvoiceItemServiceClient;
 import com.trilogyed.shippingservice.util.feign.InvoiceServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class ServiceLayer {
+
     private InvoiceItemServiceClient invoiceItemClient;
     private InvoiceServiceClient invoiceClient;
 
@@ -60,6 +63,7 @@ public class ServiceLayer {
     public void deleteInvoice(Integer invoiceId)
     {
         try{
+            invoiceItemClient.deleteInvoiceItemByInvoiceId(invoiceId);
             invoiceClient.deleteInvoiceByInvoiceId(invoiceId);
         }catch(IllegalArgumentException e)
         {
@@ -69,16 +73,62 @@ public class ServiceLayer {
 
     public InvoiceViewModel getInvoice(Integer invoiceId)
     {
-        try
-        {
-            Invoice invoice = invoiceClient.getInvoiceByInvoiceId(invoiceId);
-            
+        Invoice invoice = invoiceClient.getInvoiceByInvoiceId(invoiceId);
+        return build(invoice);
+//        Invoice invoice = invoiceClient.getInvoiceByInvoiceId(invoiceId);
+//        if (invoice == null) {
+//            throw new TupleNotFoundException(String.format("No invoice exists for id %d", invoiceId));
+//        }
+//        List<InvoiceItem> invoiceItems = invoiceItemClient.getInvoiceItemsByInvoiceId(invoiceId);
+//
+//        InvoiceViewModel ivm = build(invoice);
+//        ivm.setInvoiceItems(invoiceItems);
+//        return ivm;
+    }
+
+    public List<InvoiceViewModel> getInvoiceByCustomerId(Integer customerId) {
+        List<Invoice> invoices = invoiceClient.getInvoicesByCustomerId(customerId);
+        if (invoices.size() == 0) {
+            throw new TupleNotFoundException(String.format("No invoices for customerId %d", customerId));
         }
+
+        List<InvoiceViewModel> ivmList = new ArrayList<>();
+
+        for (Invoice invoice : invoices) {
+            InvoiceViewModel ivm = build(invoice);
+            List<InvoiceItem> invoiceItems = invoiceItemClient.getInvoiceItemsByInvoiceId(invoice.getInvoiceId());
+            ivm.setInvoiceItems(invoiceItems);
+            ivmList.add(ivm);
+        }
+
+        return ivmList;
+    }
+
+    public List<InvoiceViewModel> getAllInvoices() {
+        List<Invoice> invoices = invoiceClient.getAllInvoice();
+        if (invoices.size() == 0) {
+            throw new TupleNotFoundException("No invoices found");
+        }
+
+        List<InvoiceViewModel> ivmList = new ArrayList<>();
+
+        for (Invoice invoice : invoices) {
+            InvoiceViewModel ivm = build(invoice);
+            List<InvoiceItem> invoiceItems = invoiceItemClient.getInvoiceItemsByInvoiceId(invoice.getInvoiceId());
+            ivm.setInvoiceItems(invoiceItems);
+            ivmList.add(ivm);
+        }
+
+        return ivmList;
     }
 
 
     public Invoice build(InvoiceViewModel ivm) {
         return (new MapClasses<>(ivm, Invoice.class)).mapFirstToSecond(false);
+    }
+
+    public InvoiceViewModel build(Invoice invoice) {
+        return (new MapClasses<>(invoice, InvoiceViewModel.class)).mapFirstToSecond(false);
     }
 
     public void calculateCostsAndSurcharge(InvoiceViewModel ivm)

@@ -1,14 +1,15 @@
 package com.trilogyed.shippingservice.util.feign;
 
 import com.trilogyed.shippingservice.domain.Invoice;
+import com.trilogyed.shippingservice.domain.InvoiceItem;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@FeignClient(name = "invoice-service")
-@RequestMapping("/invoice")
+@FeignClient(name = "invoice-service", contextId = "invoice-service")
+@RequestMapping("/invoices")
 public interface InvoiceServiceClient {
 
     @PostMapping
