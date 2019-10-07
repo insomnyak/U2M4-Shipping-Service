@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,7 +46,34 @@ public class ServiceLayer {
 
     public void updateInvoice(InvoiceViewModel ivm)
     {
+        Invoice invoice = build(ivm);
+        invoiceClient.updateInvoice(invoice);
+        List<InvoiceItem> invoiceItems = ivm.getInvoiceItems();
+        invoiceItems.stream()
+                .forEach(invoiceItem -> {
+                    invoiceItemClient.deleteInvoiceItemById(invoice.getInvoiceId());
+                });
+        invoiceItems = invoiceItemClient.getInvoiceItemsByInvoiceId(invoice.getInvoiceId());
+        ivm.setInvoiceItems(invoiceItems);
+    }
 
+    public void deleteInvoice(Integer invoiceId)
+    {
+        try{
+            invoiceClient.deleteInvoiceByInvoiceId(invoiceId);
+        }catch(IllegalArgumentException e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public InvoiceViewModel getInvoice(Integer invoiceId)
+    {
+        try
+        {
+            Invoice invoice = invoiceClient.getInvoiceByInvoiceId(invoiceId);
+            
+        }
     }
 
 
