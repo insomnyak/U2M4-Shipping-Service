@@ -40,8 +40,8 @@ create table if not exists invoice (
     customer_id int(11) not null,
     shipto_zip char(5) not null,
     purchase_date date not null,
-    total_cost decimal(7.2) not null,
-    sales_tax decimal(7.2) not null,
+    total_cost decimal(7,2) not null,
+    sales_tax decimal(7,2) not null,
     surcharge decimal(7,2) not null
 );
 
